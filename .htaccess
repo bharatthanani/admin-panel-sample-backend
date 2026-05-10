@@ -1,0 +1,5 @@
+# Allow access to .htaccess file
+<Files ".htaccess">
+    Order allow,deny
+    Allow from all
+</Files>
