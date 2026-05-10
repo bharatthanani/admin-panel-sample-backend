@@ -121,37 +121,7 @@ class StoreController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
+    
 
     public function getStoreTags(Request $request){
         $tags = Tag::where('status',1)->get();
@@ -355,6 +325,51 @@ class StoreController extends Controller
         return response()->json([
             'message' => 'Store products fetched successfully',
             'products' => $products
+        ]);
+    }
+
+
+    public function deleteStore($id)
+    {
+        $store = Store::find($id);
+
+        if (!$store) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Store not found'
+            ], 404);
+        }
+
+        // Get store products
+        $products = Product::where('store_id', $store->id)->get();
+
+        // Delete product images and products
+        foreach ($products as $product) {
+
+            // Delete product image if exists
+            if ($product->product_image && file_exists(public_path('documents/product/' . $product->product_image))) {
+                unlink(public_path('documents/product/' . $product->product_image));
+            }
+
+            $product->delete();
+        }
+
+        // Delete store logo
+        if ($store->store_logo && file_exists(public_path('documents/store/' . $store->store_logo))) {
+            unlink(public_path('documents/store/' . $store->store_logo));
+        }
+
+        // Delete store cover image
+        if ($store->store_cover_image && file_exists(public_path('documents/store/' . $store->store_cover_image))) {
+            unlink(public_path('documents/store/' . $store->store_cover_image));
+        }
+
+        // Delete store
+        $store->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Store and related products deleted successfully'
         ]);
     }
 }

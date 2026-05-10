@@ -44,24 +44,28 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('/users/{id}/assign-role',      [RolePermissionController::class, 'assignRole']);
     // });
 
-    Route::get('get-users',[UserController::class,'getUsers']);
-    Route::get('get-vendors',[UserController::class,'getVendors']);
-    Route::get('delete-user/{id}', [UserController::class, 'deleteUser']);
-    Route::post('add-user', [UserController::class, 'addUser']);
-    Route::post('update-user/{id}', [UserController::class, 'updateUser']);
-
-    // get colors
-     Route::get('get-colors-backend',[ProductController::class,'getColorsForBackend']);
-     Route::get('get-categories-backend',[ProductController::class,'getCategoryBackend']);
-     Route::post('add-product-backend',[ProductController::class,'addProductBackend']);
-     Route::get('get-product-backend',[ProductController::class,'getProductBackend']);
-
-     Route::post('add-update-category-backend',[ProductController::class,'addUpdateCategoryBackend']);
-     Route::get('delete-category-backend/{id}',[ProductController::class,'deleteCategoryBackend']);
+    Route::prefix('user')->group(function () {
+        Route::get('get-users',[UserController::class,'getUsers']);
+        Route::get('get-vendors',[UserController::class,'getVendors']);
+        Route::get('delete-user/{id}', [UserController::class, 'deleteUser']);
+        Route::post('add-user', [UserController::class, 'addUser']);
+        Route::post('update-user/{id}', [UserController::class, 'updateUser']);
+    });
+    Route::prefix('product')->group(function () {
+        Route::get('get-colors-backend',[ProductController::class,'getColorsForBackend']);
+        Route::get('get-categories-backend',[ProductController::class,'getCategoryBackend']);
+        Route::post('add-product-backend',[ProductController::class,'addProductBackend']);
+        Route::get('get-product-backend',[ProductController::class,'getProductBackend']);
+        Route::get('delete-product-backend/{id}',[ProductController::class,'deleteProductBackend']);
+        Route::post('add-update-category-backend',[ProductController::class,'addUpdateCategoryBackend']);
+        Route::get('delete-category-backend/{id}',[ProductController::class,'deleteCategoryBackend']);
+    });
+     
      Route::prefix('store')->group(function () {
             Route::resource('stores', StoreController::class);
             Route::get('get-store-tags',[StoreController::class,'getStoreTags']);
             Route::post('add-store',[StoreController::class,'addStore']);
+            Route::get('delete-store/{id}',[StoreController::class,'deleteStore']);
             Route::post('update-store/{id}',[StoreController::class,'updateStore']);
             Route::get('get-stores-backend',[StoreController::class,'getStoresBackend']);
             Route::get('get-store-category-backend/{id}',[StoreController::class,'getStoreCategoryBackend']);

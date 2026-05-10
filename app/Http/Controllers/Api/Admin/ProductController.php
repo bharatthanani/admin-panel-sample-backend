@@ -207,4 +207,14 @@ class ProductController extends Controller
             return response()->json(['message' => 'Error occurred while updating category','status'=>false]);
         }
     }
+
+    public function deleteProductBackend(Request $request,$id)
+    {
+        $product = Product::where(['id'=>$id])->delete();
+        if($product){
+            return response()->json(['message' => 'Product deleted successfully','product' => $product,'status'=>true]);
+        }else{
+            return response()->json(['message' => 'Error occurred while updating product','status'=>false]);
+        }
+    }
 }
