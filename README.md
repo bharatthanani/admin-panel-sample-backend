@@ -81,6 +81,8 @@ MySQL >= 5.7.7 or MariaDB >= 10.3
 Laravel >= 10
 
 # ── Laravel ───────────────────────────────────────
+composer install
+
 php artisan serve                          # Start dev server
 php artisan migrate                        # Run migrations
 php artisan migrate:fresh --seed           # Fresh DB + seed
