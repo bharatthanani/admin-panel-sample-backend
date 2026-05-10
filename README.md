@@ -1,66 +1,102 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+AdminPanel  Role-Based Management System
+A full-stack role-based admin panel built with Vue.js 3 (frontend) and Laravel (backend). Three roles  Admin, Vendor, and User  each with their own access level, permissions, and dashboard view.
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Project Overview
+This is a sample role-based management system that demonstrates how to implement granular access control across a multi-role web application.
+RoleDescriptionAdminFull access  manage users, roles, permissions, stores, products, categoriesVendorCan create/manage their own stores and products onlyUserRead-only access  can view data but cannot create, edit, or delete
 
-## About Laravel
+Features
+🔐 Authentication & Authorization
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+JWT-based login via Laravel Passport
+Role & permission system via Spatie Laravel Permission
+Dynamic sidebar navigation based on user permissions
+Route-level guards on both frontend (Vue Router) and backend (middleware)
+v-permission and v-role directives for template-level access control
+Direct URL access blocked for unauthorized users
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+👥 User Management (Admin only)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+View all users with role, status, and join date
+Add new users with role assignment
+Edit user details and change roles
+Delete users
+Profile picture upload
 
-## Learning Laravel
+🏪 Store Management (Admin + Vendor)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Admin: full CRUD on all stores
+Vendor: manage only their own stores
+Assign categories and tags to stores
+Upload store logo and cover image
+View store-specific products
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+📦 Product Management (Admin + Vendor)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Add products with name, price, quantity, description
+Assign products to stores and categories
+Upload front image and multiple additional images
+Color selection via multiselect
+Low stock indicator (qty < 10)
 
-## Laravel Sponsors
+🗂️ Category Management (Admin only)
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Add, edit, delete categories
+Upload category images
+Live search filter
 
-### Premium Partners
+🛡️ Role & Permission Management (Admin only)
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+View all roles (Admin, Vendor, User) with permission breakdown
+Toggle individual permissions per role
+Assign or change a user's role in real-time
+Permission counts and user counts per role
 
-## Contributing
+📊 Dashboard
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Role-aware stat cards (each role sees relevant stats)
+Recent users table (Admin)
+Recent products table (Admin + Vendor)
+Store overview list (Admin + Vendor)
+Top categories with progress bars (all roles)
+Role & permission overview grid (Admin only)
+Export PDF button
 
-## Code of Conduct
+🎨 UI/UX
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Premium white sidebar with indigo accent (Mayors CRM-inspired)
+PremiumLoader component (frosted glass + spinning gradient arc)
+Fully responsive — mobile hamburger sidebar
+Dynamic breadcrumbs, role badges, user avatars
+Toast notifications for all actions
+Confirmation modals for delete actions
 
-## Security Vulnerabilities
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Backend Setup (Laravel)
+Requirements
 
-## License
+PHP >= 8.1
+Composer
+MySQL >= 5.7.7 or MariaDB >= 10.3
+Laravel >= 10
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# ── Laravel ───────────────────────────────────────
+php artisan serve                          # Start dev server
+php artisan migrate                        # Run migrations
+php artisan migrate:fresh --seed           # Fresh DB + seed
+php artisan db:seed --class=RolePermissionSeeder  # Seed roles only
+php artisan permission:cache-reset         # Clear permission cache
+php artisan optimize:clear                 # Clear all cache
+php artisan passport:install               # Install Passport keys
+php artisan tinker                         # Interactive shell
+
+# Check user roles in tinker
+$user = \App\Models\User::find(1);
+$user->getRoleNames();
+$user->getAllPermissions()->pluck('name');
+
+
+# Fix permission guard_name if needed (tinker)
+\Spatie\Permission\Models\Role::query()->update(['guard_name' => 'api']);
+\Spatie\Permission\Models\Permission::query()->update(['guard_name' => 'api']);
+php artisan permission:cache-reset
