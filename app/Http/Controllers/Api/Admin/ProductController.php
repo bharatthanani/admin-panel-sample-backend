@@ -46,7 +46,6 @@ class ProductController extends Controller
             'productImages'
         ])->orderBy('id', 'DESC');
 
-        // If vendor, show only own products
         if ($user->hasRole('vendor')) {
 
             // $query->where('user_id', $user->id);
@@ -81,18 +80,14 @@ class ProductController extends Controller
             if ($request->hasFile('product_image')) {
                 $file = $request->file('product_image');
 
-                // Create unique filename
                 $filename = time().'_'.$file->getClientOriginalName();
 
-                // Save the file to public/documents/profile
                 $file->move(public_path('documents/product'), $filename);
 
-                // Save filename in database
                 $productData['product_image'] =  $filename;
             }
 
-
-//            $addProduct  = Product::Create($productData);
+//          $addProduct  = Product::Create($productData);
 
             $product = $request->id
                 ? Product::with([])->find($request->id)->update($productData)
@@ -132,8 +127,8 @@ class ProductController extends Controller
             {
                 foreach ($request->color_id as $color) {
                     $colorData = [
-                        'product_id' => $productId, // Use the product ID
-                        'color_id' => $color // Insert the color ID
+                        'product_id' => $productId, 
+                        'color_id' => $color 
                     ];
                     ProductColor::create($colorData);
                 }
@@ -153,8 +148,7 @@ class ProductController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-
-            // Handle the error, and optionally log it or return it to the client
+            Log::error('Error in addProductBackend: '.$e->getMessage());
             return response()->json([
                 'message' => 'Error occurred while creating the product',
                 'error' => $e->getMessage(),
@@ -163,15 +157,6 @@ class ProductController extends Controller
 
     }
 
-    public function getProductDetail(Request $request,$id)
-    {
-        $products = Product::with(['productColors','productImages'])->where('id',$id)->first();
-
-        return response()->json([
-            'message' => 'Producr fatech',
-            'products' => $products
-        ]);
-    }
 
     public function addUpdateCategoryBackend(Request $request)
     {

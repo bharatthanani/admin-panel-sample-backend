@@ -11,7 +11,7 @@ use Spatie\Permission\Models\Permission;
 
 class RolePermissionController extends Controller
 {
-    // ── GET /api/roles — list all roles with permissions ──
+  
     public function getRoles()
     {
         $roles = Role::with('permissions')->get()->map(fn($role) => [
@@ -24,7 +24,7 @@ class RolePermissionController extends Controller
         return response()->json(['success' => true, 'roles' => $roles]);
     }
 
-    // ── GET /api/permissions — list all permissions ──
+    
     public function getPermissions()
     {
         $permissions = Permission::all()->groupBy(fn($p) => explode('.', $p->name)[0]);
@@ -32,7 +32,7 @@ class RolePermissionController extends Controller
         return response()->json(['success' => true, 'permissions' => $permissions]);
     }
 
-    // ── POST /api/roles — create new role ──
+    
     public function createRole(Request $request)
     {
         $request->validate(['name' => 'required|string|unique:roles,name']);
@@ -46,12 +46,12 @@ class RolePermissionController extends Controller
         return response()->json(['success' => true, 'message' => 'Role created!', 'role' => $role]);
     }
 
-    // ── PUT /api/roles/{id} — update role permissions ──
+    
     public function updateRoleOLd(Request $request, $id)
     {
         $role = Role::findOrFail($id);
 
-        // Protect core roles from rename
+       
         if (in_array($role->name, ['admin', 'vendor', 'user']) && $request->name !== $role->name) {
             return response()->json(['success' => false, 'error' => 'Cannot rename core roles.'], 403);
         }
@@ -71,7 +71,7 @@ class RolePermissionController extends Controller
     {
         $role = Role::findOrFail($id);
 
-        // Protect core roles from rename
+        
         if (
             $request->has('name') &&
             in_array($role->name, ['admin', 'vendor', 'user']) &&
@@ -97,7 +97,7 @@ class RolePermissionController extends Controller
         ]);
     }
 
-    // ── DELETE /api/roles/{id} — delete role ──
+    
     public function deleteRole($id)
     {
         $role = Role::findOrFail($id);
@@ -111,7 +111,7 @@ class RolePermissionController extends Controller
         return response()->json(['success' => true, 'message' => 'Role deleted!']);
     }
 
-    // ── GET /api/users — list users with roles ──
+   
     public function getUsers()
     {
         $users = User::with('roles')->get()->map(fn($u) => [
@@ -126,13 +126,13 @@ class RolePermissionController extends Controller
         return response()->json(['success' => true, 'users' => $users]);
     }
 
-    // ── POST /api/users/{id}/assign-role — assign role to user ──
+   
     public function assignRole(Request $request, $id)
     {
         $request->validate(['role' => 'required|string|exists:roles,name']);
 
         $user = User::findOrFail($id);
-        $user->syncRoles([$request->role]);   // removes old role, assigns new
+        $user->syncRoles([$request->role]);   
 
         return response()->json([
             'success' => true,
@@ -140,7 +140,7 @@ class RolePermissionController extends Controller
         ]);
     }
 
-    // ── GET /api/me/permissions — current user's permissions ──
+    
     public function myPermissions(Request $request)
     {
         $user = $request->user();

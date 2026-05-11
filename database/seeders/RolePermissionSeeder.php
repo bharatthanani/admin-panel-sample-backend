@@ -18,42 +18,19 @@ class RolePermissionSeeder extends Seeder
 
         // ── 1. Define all permissions ──
         $permissions = [
-            // Users  (UserController)
-            'users.list',           // GET  get-users
-            'users.vendors',        // GET  get-vendors
-            'users.create',         // POST add-user
-            'users.update',         // POST update-user/{id}
-            'users.delete',         // GET  delete-user/{id}
-
-            // Products  (ProductController)
-            'products.list',        // GET  get-product-backend
-            'products.create',      // POST add-product-backend
-            'products.colors',      // GET  get-colors-backend
-            'products.categories',  // GET  get-categories-backend
-            'products.update',      // POST update-product-backend/{id}
-            'products.delete',      // GET  delete-product-backend/{id}
-
-            // Categories  (ProductController)
-            'categories.list',      // GET  get-categories-backend
-            'categories.create',    // POST add-category-backend
-            'categories.update',    // POST update-category-backend/{id}
-            'categories.delete',    // GET  delete-category-backend/{id}
-
-            // Stores  (StoreController)
-            'stores.list',          // GET  get-stores-backend
-            'stores.create',        // POST add-store
-            'stores.update',        // POST update-store/{id}
-            'stores.delete',        // DELETE stores resource
-            'stores.category',      // GET  get-store-category-backend/{id}
-            'stores.products',      // GET  stores/{storeId}/products
-
+            // Users
+            'users.list', 'users.vendors', 'users.create', 'users.update', 'users.delete',
+            // Products
+            'products.list', 'products.create', 'products.colors',
+            'products.categories', 'products.update', 'products.delete',
+            // Categories
+            'categories.list', 'categories.create', 'categories.update', 'categories.delete',
+            // Stores
+            'stores.list', 'stores.create', 'stores.update', 'stores.delete',
+            'stores.category', 'stores.products',
             // Roles & Permissions
-            'roles.view',           // GET  /roles
-            'roles.create',         // POST /roles
-            'roles.update',         // PUT  /roles/{id}
-            'roles.delete',         // DELETE /roles/{id}
-            'permissions.view',     // GET  /permissions
- 
+            'roles.view', 'roles.create', 'roles.update', 'roles.delete',
+            'permissions.view',
         ];
 
         foreach ($permissions as $perm) {
@@ -62,35 +39,32 @@ class RolePermissionSeeder extends Seeder
 
         // ── 2. Create roles & assign permissions ──
 
-        // Admin — everything except user management (super admin does that)
         $admin = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'api']);
         $admin->syncPermissions([
-            'products.list','products.create','users.list','users.vendors','users.create','users.update','users.delete',
-            'stores.list','stores.create','stores.update','stores.delete',
+            'users.list','users.vendors','users.create','users.update','users.delete',
+            'products.list','products.create','products.update','products.delete','products.colors','products.categories',
+            'stores.list','stores.create','stores.update','stores.delete','stores.category','stores.products',
             'categories.list','categories.create','categories.update','categories.delete',
             'roles.view','roles.create','roles.update','roles.delete',
-            'permissions.view','products.update','products.delete','stores.products'
+            'permissions.view',
         ]);
 
-        // Vendor — own products & store only
         $vendor = Role::firstOrCreate(['name' => 'vendor', 'guard_name' => 'api']);
         $vendor->syncPermissions([
             'products.list','products.create','products.update','products.delete',
-            'stores.list','stores.update',
-            'stores.products'
+            'stores.list','stores.update','stores.products',
         ]);
 
-        // User — read only
-        $user = Role::firstOrCreate(['name' => 'user', 'guard_name' => 'api']);
-        $user->syncPermissions([
+        $userRole = Role::firstOrCreate(['name' => 'user', 'guard_name' => 'api']);
+        $userRole->syncPermissions([
             'products.list',
             'stores.list',
-            'users.list',
-            'stores.products'
-            
+            'stores.products',
         ]);
 
-        // ── 3. Create default super admin (gets ALL permissions) ──
+        // ── 3. Create demo users ──────────────────────────────────
+
+        // Super Admin
         $superAdmin = User::firstOrCreate(
             ['email' => 'superadmin@admin.com'],
             [
@@ -98,25 +72,47 @@ class RolePermissionSeeder extends Seeder
                 'last_name'  => 'Admin',
                 'password'   => Hash::make('12345'),
                 'status'     => 1,
-                'role'      => 'admin',
             ]
         );
-        // Give super admin every permission directly (bypasses role checks)
         $superAdmin->syncPermissions(Permission::all());
-        // Also assign admin role so role checks work
         $superAdmin->syncRoles(['admin']);
 
-        $this->command->info('✅ Roles, permissions, and super admin seeded!');
+        // ── Vendor demo account ──
+        $vendorUser = User::firstOrCreate(
+            ['email' => 'vendor@demo.com'],
+            [
+                'first_name' => 'Demo',
+                'last_name'  => 'Vendor',
+                'password'   => Hash::make('12345'),
+                'status'     => 1,
+            ]
+        );
+        $vendorUser->syncRoles(['vendor']);
+        // Vendor gets permissions from their role (no direct permissions needed)
+        $vendorUser->syncPermissions([]);
+
+        // ── User demo account ──
+        $normalUser = User::firstOrCreate(
+            ['email' => 'user@demo.com'],
+            [
+                'first_name' => 'Demo',
+                'last_name'  => 'User',
+                'password'   => Hash::make('12345'),
+                'status'     => 1,
+            ]
+        );
+        $normalUser->syncRoles(['user']);
+        $normalUser->syncPermissions([]);
+
+        // ── Summary ──
+        $this->command->info('✅ Roles and permissions seeded!');
+        $this->command->table(
+            ['Role', 'Email', 'Password'],
+            [
+                ['Admin',  'superadmin@admin.com', '12345'],
+                ['Vendor', 'vendor@demo.com',      '12345'],
+                ['User',   'user@demo.com',         '12345'],
+            ]
+        );
     }
 }
-
-
-// ── Register seeder in DatabaseSeeder.php ──
-// database/seeders/DatabaseSeeder.php
-//
-// public function run(): void
-// {
-//     $this->call([
-//         RolePermissionSeeder::class,
-//     ]);
-// }

@@ -24,22 +24,20 @@ use App\Http\Controllers\Api\Admin\StoreController;
 //     return $request->user();
 // });
 
-Route::middleware(['auth:api'])->group(function () {
+Route::post('/login', [AuthController::class, 'login']);
+Route::post("create-account",[UserController::class,'createAccount'])->name("create-account");
 
+Route::middleware(['auth:api'])->group(function () {
     Route::get('/me/permissions', [RolePermissionController::class, 'myPermissions']);
 
     // Route::middleware('role:admin')->group(function () {
-
-        // Roles CRUD
         Route::get('/roles',           [RolePermissionController::class, 'getRoles']);
         Route::post('/roles',          [RolePermissionController::class, 'createRole']);
         Route::put('/roles/{id}',      [RolePermissionController::class, 'updateRole']);
         Route::delete('/roles/{id}',   [RolePermissionController::class, 'deleteRole']);
-
-        // Permissions list
+     
         Route::get('/permissions',     [RolePermissionController::class, 'getPermissions']);
 
-        // Users with role assignment
         Route::get('/users',                        [RolePermissionController::class, 'getUsers']);
         Route::post('/users/{id}/assign-role',      [RolePermissionController::class, 'assignRole']);
     // });
@@ -62,20 +60,18 @@ Route::middleware(['auth:api'])->group(function () {
     });
      
      Route::prefix('store')->group(function () {
-            Route::resource('stores', StoreController::class);
-            Route::get('get-store-tags',[StoreController::class,'getStoreTags']);
-            Route::post('add-store',[StoreController::class,'addStore']);
-            Route::get('delete-store/{id}',[StoreController::class,'deleteStore']);
-            Route::post('update-store/{id}',[StoreController::class,'updateStore']);
-            Route::get('get-stores-backend',[StoreController::class,'getStoresBackend']);
-            Route::get('get-store-category-backend/{id}',[StoreController::class,'getStoreCategoryBackend']);
-            Route::get('stores/{storeId}/products', [StoreController::class, 'getStoreProducts']);
+        Route::resource('stores', StoreController::class);
+        Route::get('get-store-tags',[StoreController::class,'getStoreTags']);
+        Route::post('add-store',[StoreController::class,'addStore']);
+        Route::get('delete-store/{id}',[StoreController::class,'deleteStore']);
+        Route::post('update-store/{id}',[StoreController::class,'updateStore']);
+        Route::get('get-stores-backend',[StoreController::class,'getStoresBackend']);
+        Route::get('get-store-category-backend/{id}',[StoreController::class,'getStoreCategoryBackend']);
+        Route::get('stores/{storeId}/products', [StoreController::class, 'getStoreProducts']);
      });
 
 });
 
-Route::post('/login', [AuthController::class, 'login']);
-Route::post("create-account",[UserController::class,'createAccount'])->name("create-account");
 
 
 

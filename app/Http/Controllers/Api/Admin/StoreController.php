@@ -19,29 +19,7 @@ use Illuminate\Support\Facades\Log;
 
 class StoreController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-
-    }
     public function addStore(Request $request)
     {
 
@@ -198,14 +176,8 @@ class StoreController extends Controller
                 'tag_id',
             ]);
 
-            /*
-            |--------------------------------------------------------------------------
-            | STORE LOGO
-            |--------------------------------------------------------------------------
-            */
             if ($request->hasFile('store_logo')) {
 
-                // OLD IMAGE DELETE
                 if ($store->store_logo && file_exists(public_path('documents/store/' . $store->store_logo))) {
                     unlink(public_path('documents/store/' . $store->store_logo));
                 }
@@ -219,14 +191,8 @@ class StoreController extends Controller
                 $storeData['store_logo'] = $filename;
             }
 
-            /*
-            |--------------------------------------------------------------------------
-            | STORE COVER IMAGE
-            |--------------------------------------------------------------------------
-            */
             if ($request->hasFile('store_cover_image')) {
 
-                // OLD IMAGE DELETE
                 if ($store->store_cover_image && file_exists(public_path('documents/store/' . $store->store_cover_image))) {
                     unlink(public_path('documents/store/' . $store->store_cover_image));
                 }
@@ -240,18 +206,8 @@ class StoreController extends Controller
                 $storeData['store_cover_image'] = $filename;
             }
 
-            /*
-            |--------------------------------------------------------------------------
-            | UPDATE STORE
-            |--------------------------------------------------------------------------
-            */
             $store->update($storeData);
 
-            /*
-            |--------------------------------------------------------------------------
-            | UPDATE CATEGORY
-            |--------------------------------------------------------------------------
-            */
             StoreCategory::where('store_id', $store->id)->delete();
 
             if ($request->has('category_id')) {
@@ -265,11 +221,6 @@ class StoreController extends Controller
                 }
             }
 
-            /*
-            |--------------------------------------------------------------------------
-            | UPDATE TAGS
-            |--------------------------------------------------------------------------
-            */
             StoreTag::where('store_id', $store->id)->delete();
 
             if ($request->has('tag_id')) {
@@ -340,13 +291,10 @@ class StoreController extends Controller
             ], 404);
         }
 
-        // Get store products
         $products = Product::where('store_id', $store->id)->get();
 
-        // Delete product images and products
         foreach ($products as $product) {
 
-            // Delete product image if exists
             if ($product->product_image && file_exists(public_path('documents/product/' . $product->product_image))) {
                 unlink(public_path('documents/product/' . $product->product_image));
             }
@@ -354,17 +302,14 @@ class StoreController extends Controller
             $product->delete();
         }
 
-        // Delete store logo
         if ($store->store_logo && file_exists(public_path('documents/store/' . $store->store_logo))) {
             unlink(public_path('documents/store/' . $store->store_logo));
         }
 
-        // Delete store cover image
         if ($store->store_cover_image && file_exists(public_path('documents/store/' . $store->store_cover_image))) {
             unlink(public_path('documents/store/' . $store->store_cover_image));
         }
 
-        // Delete store
         $store->delete();
 
         return response()->json([

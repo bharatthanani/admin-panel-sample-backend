@@ -48,6 +48,7 @@ class UserController extends Controller
     public function getUsers()
     {
         $user = User::with('roles')
+            ->where('id', '!=', auth()->id())
             ->orderBy('id', 'DESC')
             ->paginate(10);
         // $user = User::orderBy('id','DESC')->get();
@@ -99,14 +100,13 @@ class UserController extends Controller
             'last_name'  => 'required|string|max:255',
             'email'      => 'required|email|unique:users',
             'password'   => 'required|min:5',
-            'role'       => 'required|string|in:admin,vendor,user', // ← validate role
+            'role'       => 'required|string|in:admin,vendor,user', 
         ]);
 
         $data = $request->except(['confirm_password']);
         $data['password'] = Hash::make($request->password);
         $data['status']   = $request->status ?? 1;
 
-        // Handle profile picture
         if ($request->hasFile('profile_picture')) {
             $file     = $request->file('profile_picture');
             $filename = time() . '_' . $file->getClientOriginalName();
@@ -116,7 +116,6 @@ class UserController extends Controller
 
         $user = User::create($data);
 
-        // ── Assign role ──
         $user->assignRole($request->role);
 
         return response()->json([
@@ -147,12 +146,10 @@ class UserController extends Controller
 
         $data = $request->except(['confirm_password', 'password']);
 
-        // Only hash password if provided
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
         }
 
-        // Handle profile picture
         if ($request->hasFile('profile_picture')) {
             if ($user->profile_picture && file_exists(public_path('documents/profile/' . $user->profile_picture))) {
                 unlink(public_path('documents/profile/' . $user->profile_picture));
@@ -165,9 +162,8 @@ class UserController extends Controller
 
         $user->update($data);
 
-        // ── Update role if provided ──
         if ($request->filled('role')) {
-            $user->syncRoles([$request->role]); // removes old role, assigns new
+            $user->syncRoles([$request->role]); 
         }
 
         return response()->json([
